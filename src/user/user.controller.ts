@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -24,6 +25,11 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
+import { JwtUser } from '../auth/interfaces/auth.interface';
+
+interface RequestWithUser {
+  user: JwtUser;
+}
 
 @ApiTags('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -124,6 +130,8 @@ export class UserController {
     status: 200,
     description: 'The user has been successfully deleted.',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({
     status: 404,
     description: 'User with the specified id was not found.',
@@ -133,7 +141,14 @@ export class UserController {
     description:
       'Cannot delete the user because they have associated class registrations. The registrations must be deleted first.',
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.userService.remove(id);
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete your own account.',
+  })
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req: RequestWithUser,
+  ): Promise<void> {
+    return this.userService.remove(id, req.user.id);
   }
 }
