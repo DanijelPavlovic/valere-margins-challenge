@@ -205,8 +205,8 @@ describe('SportsService', () => {
       mockRepository.findOne.mockResolvedValue(mockSport);
       mockRepository.remove.mockResolvedValue(mockSport);
 
-      const result = await service.remove(1);
-      expect(result).toEqual(mockSport);
+      await service.remove(1);
+      expect(mockRepository.remove).toHaveBeenCalledWith(mockSport);
     });
 
     it('should throw NotFoundException if sport not found', async function (this: void) {

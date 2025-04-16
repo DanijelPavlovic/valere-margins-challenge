@@ -113,21 +113,6 @@ npm run test:e2e
 npm run test:cov
 ```
 
-## 🔧 Development
-
-### Database Management
-
-```bash
-# Start database
-make start-db
-
-# Stop database
-make stop-db
-
-# View database logs
-make logs-db
-```
-
 ## 📄 License
 
 This project is licensed under the MIT License.
