@@ -29,7 +29,9 @@ export class Schedule {
     description: 'The sports class this schedule belongs to',
     type: () => SportsClass,
   })
-  @ManyToOne(() => SportsClass, (sportsClass) => sportsClass.schedules)
+  @ManyToOne(() => SportsClass, (sportsClass) => sportsClass.schedules, {
+    onDelete: 'CASCADE',
+  })
   sportsClass: SportsClass;
 
   @ApiProperty({
