@@ -30,13 +30,6 @@ export class ClassRegistration {
   })
   sportsClass: SportsClass;
 
-  @Column({ default: false })
-  @ApiProperty({
-    description: 'Whether the registration is confirmed',
-    default: false,
-  })
-  isConfirmed: boolean;
-
   @CreateDateColumn()
   @ApiProperty({ description: 'The date when the registration was created' })
   createdAt: Date;

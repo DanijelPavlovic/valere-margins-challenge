@@ -123,7 +123,6 @@ export class SportsController {
   @ApiResponse({
     status: 200,
     description: 'The sport has been successfully deleted.',
-    type: Sport,
   })
   @ApiResponse({
     status: 404,
@@ -134,7 +133,7 @@ export class SportsController {
     description:
       'Cannot delete the sport because it has associated classes. The classes must be deleted first.',
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<Sport> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.sportsService.remove(id);
   }
 }

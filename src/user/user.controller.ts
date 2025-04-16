@@ -123,7 +123,6 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully deleted.',
-    type: User,
   })
   @ApiResponse({
     status: 404,

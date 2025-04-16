@@ -65,7 +65,7 @@ export class SportsService {
     return this.sportsRepository.save(sport);
   }
 
-  async remove(id: number): Promise<Sport> {
+  async remove(id: number): Promise<void> {
     const sport = await this.findOne(id);
 
     const relatedClasses = await this.sportsClassRepository.find({
@@ -78,6 +78,6 @@ export class SportsService {
       );
     }
 
-    return this.sportsRepository.remove(sport);
+    await this.sportsRepository.remove(sport);
   }
 }

@@ -131,6 +131,11 @@ export class ClassController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 404, description: 'Class not found.' })
+  @ApiResponse({
+    status: 409,
+    description:
+      'Cannot delete the class because it has registered participants. The registrations must be deleted first.',
+  })
   @ApiParam({ name: 'id', description: 'Class ID' })
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {

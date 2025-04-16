@@ -29,8 +29,32 @@ export class ClassService {
   async create(createClassDto: CreateClassDto): Promise<SportsClass> {
     await this.sportsService.findOne(createClassDto.sportId);
 
-    const newClass = this.classRepository.create(createClassDto);
-    return this.classRepository.save(newClass);
+    const queryRunner =
+      this.classRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const { schedules, ...classData } = createClassDto;
+      const newClass = this.classRepository.create(classData);
+      const savedClass = await queryRunner.manager.save(SportsClass, newClass);
+
+      if (schedules && schedules.length) {
+        const newSchedules = schedules.map((schedule) => ({
+          ...schedule,
+          sportsClass: { id: savedClass.id },
+        }));
+        await queryRunner.manager.save(Schedule, newSchedules);
+      }
+
+      await queryRunner.commitTransaction();
+      return this.findOne(savedClass.id);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(sportNames?: string[]): Promise<SportsClass[]> {
@@ -69,6 +93,8 @@ export class ClassService {
     id: number,
     updateClassDto: UpdateClassDto,
   ): Promise<SportsClass> {
+    const sportsClass = await this.findOne(id);
+
     const { schedules, sportId, ...updateData } = updateClassDto;
 
     if (sportId) {
@@ -109,6 +135,17 @@ export class ClassService {
 
   async remove(id: number): Promise<void> {
     const sportsClass = await this.findOne(id);
+
+    const registrationsCount = await this.registrationRepository.count({
+      where: { sportsClass: { id } },
+    });
+
+    if (registrationsCount > 0) {
+      throw new BadRequestException(
+        'Cannot delete the class because it has registered participants. The registrations must be deleted first.',
+      );
+    }
+
     await this.classRepository.remove(sportsClass);
   }
 
